@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { useEffect, useState } from 'react';
 import './content.css';
-import { loadTasks, markShownThisSession, wasShownThisSession, loadSettings, getLastShownAt, setLastShownAt } from './utils/storage';
+import { loadTasks, markShownThisSession, wasShownThisSession, loadSettings, getLastShownAt, setLastShownAt, DEFAULT_TASKS } from './utils/storage';
 import type { Task } from './types/domain';
 
 // オーバーレイコンポーネント（React でタスクリストも描画）
@@ -9,7 +9,12 @@ function BlockerOverlay() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
-    loadTasks().then(setTasks);
+    loadTasks()
+      .then(setTasks)
+      .catch(err => {
+        console.error('Failed to load tasks:', err);
+        setTasks(DEFAULT_TASKS);
+      });
   }, []);
 
   useEffect(() => {
@@ -33,9 +38,9 @@ function BlockerOverlay() {
   };
 
   return (
-    <div id="youtube-blocker-overlay">
+    <div id="youtube-blocker-overlay" role="dialog" aria-labelledby="blocker-title" aria-modal="true">
       <div className="youtube-blocker-card">
-        <h1 className="youtube-blocker-title">代わりにやること</h1>
+        <h1 id="blocker-title" className="youtube-blocker-title">代わりにやること</h1>
         <ul className="youtube-blocker-list">
           {tasks.map(task => (
             <li key={task.id} style={{ padding: '12px 0' }}>・{task.text}</li>
@@ -74,39 +79,42 @@ function showBlocker(theme?: 'auto' | 'light' | 'dark') {
   setLastShownAt(Date.now());
 }
 
+// セッション回数制約を無視して表示（リマインダー用）
+function forceShowBlocker(theme?: 'auto' | 'light' | 'dark') {
+  if (document.getElementById('youtube-blocker-root')) return;
+  const container = document.createElement('div');
+  container.id = 'youtube-blocker-root';
+  container.setAttribute('data-yb-theme', theme ?? 'auto');
+  document.body.appendChild(container);
+  const root = createRoot(container);
+  root.render(<BlockerOverlay />);
+}
+
 // ページ読み込み時に表示
+async function initialize() {
+  const settings = await loadSettings();
+  // 直ちに初回表示
+  showBlocker(settings.theme);
+
+  // リマインダー：last が無ければ「今 + delay」を基準にする
+  if (settings.remindAfterMinutes && settings.remindAfterMinutes > 0) {
+    const delay = settings.remindAfterMinutes * 60 * 1000;
+    const last = await getLastShownAt();
+    const base = last ?? Date.now();
+    const wait = Math.max(0, base + delay - Date.now());
+    setTimeout(() => {
+      const container = document.getElementById('youtube-blocker-root');
+      if (!container) {
+        // セッション制約を無視して再表示（ユーザーが再認識できるように）
+        forceShowBlocker(settings.theme);
+        setLastShownAt(Date.now());
+      }
+    }, wait);
+  }
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', async () => {
-    const settings = await loadSettings();
-    // 直ちに表示（テーマ適用）
-    showBlocker(settings.theme);
-    // リマインダー
-    if (settings.remindAfterMinutes && settings.remindAfterMinutes > 0) {
-      const delay = settings.remindAfterMinutes * 60 * 1000;
-      const last = await getLastShownAt();
-      const nextAt = (last ?? 0) + delay;
-      const wait = Math.max(0, nextAt - Date.now());
-      setTimeout(() => {
-        // セッションの1回制約より優先して、再度表示（セッション中でも再表示OK）
-        // セッションマークは更新しない
-        const container = document.getElementById('youtube-blocker-root');
-        if (!container) showBlocker(settings.theme);
-      }, wait);
-    }
-  });
+  document.addEventListener('DOMContentLoaded', initialize);
 } else {
-  (async () => {
-    const settings = await loadSettings();
-    showBlocker(settings.theme);
-    if (settings.remindAfterMinutes && settings.remindAfterMinutes > 0) {
-      const delay = settings.remindAfterMinutes * 60 * 1000;
-      const last = await getLastShownAt();
-      const nextAt = (last ?? 0) + delay;
-      const wait = Math.max(0, nextAt - Date.now());
-      setTimeout(() => {
-        const container = document.getElementById('youtube-blocker-root');
-        if (!container) showBlocker(settings.theme);
-      }, wait);
-    }
-  })();
+  initialize();
 }
