@@ -1,4 +1,4 @@
-import type { Task } from '../types/messages'
+import type { Task, Settings } from '../types/messages'
 
 const DEFAULT_TASKS: Task[] = [
 	{ id: 'default-1', text: 'ウォーキング(30分)' },
@@ -61,6 +61,65 @@ export function markShownThisSession(): void {
 
 export function wasShownThisSession(): boolean {
 	try { return sessionStorage.getItem('yb_shown') === '1'; } catch { return false; }
+}
+
+// 設定の読み書き（リマインダー等）
+export async function loadSettings(): Promise<Settings> {
+	const defaults: Settings = { showOn: 'once_per_session', remindAfterMinutes: undefined };
+	try {
+		if (typeof chrome !== 'undefined' && chrome?.storage?.sync) {
+			return await new Promise<Settings>((resolve) => {
+				chrome.storage.sync.get(['settings'], (data: { settings?: Settings }) => {
+					resolve({ ...defaults, ...(data?.settings ?? {}) })
+				})
+			})
+		}
+	} catch {}
+	try {
+		const raw = localStorage.getItem('settings');
+		return raw ? { ...defaults, ...(JSON.parse(raw) as Settings) } : defaults;
+	} catch {
+		return defaults;
+	}
+}
+
+export async function saveSettings(settings: Settings): Promise<void> {
+	try {
+		if (typeof chrome !== 'undefined' && chrome?.storage?.sync) {
+			await new Promise<void>((resolve) => {
+				chrome.storage.sync.set({ settings }, () => resolve())
+			})
+			return
+		}
+	} catch {}
+	try { localStorage.setItem('settings', JSON.stringify(settings)) } catch {}
+}
+
+// 直近表示時刻（過剰再表示の抑止）
+export async function getLastShownAt(): Promise<number | null> {
+	try {
+		if (typeof chrome !== 'undefined' && chrome?.storage?.local) {
+			return await new Promise<number | null>((resolve) => {
+				chrome.storage.local.get(['lastShownAt'], (d: { lastShownAt?: number }) => resolve(d?.lastShownAt ?? null))
+			})
+		}
+	} catch {}
+	try {
+		const raw = localStorage.getItem('lastShownAt');
+		return raw ? Number(raw) : null;
+	} catch { return null }
+}
+
+export async function setLastShownAt(ts: number): Promise<void> {
+	try {
+		if (typeof chrome !== 'undefined' && chrome?.storage?.local) {
+			await new Promise<void>((resolve) => {
+				chrome.storage.local.set({ lastShownAt: ts }, () => resolve())
+			})
+			return
+		}
+	} catch {}
+	try { localStorage.setItem('lastShownAt', String(ts)) } catch {}
 }
 
 

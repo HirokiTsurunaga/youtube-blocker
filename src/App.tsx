@@ -1,13 +1,16 @@
 import './App.css'
 import { useEffect, useState } from 'react'
 import type { Task } from './types/messages'
-import { loadTasks, saveTasks } from './utils/storage'
+import { loadTasks, saveTasks, loadSettings, saveSettings } from './utils/storage'
+import type { Settings } from './types/messages'
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([])
+  const [settings, setSettings] = useState<Settings>({ showOn: 'once_per_session', remindAfterMinutes: undefined })
 
   useEffect(() => {
     loadTasks().then(setTasks)
+    loadSettings().then(setSettings)
   }, [])
 
   const addTask = () => {
@@ -27,7 +30,10 @@ function App() {
       .map(t => ({ ...t, text: t.text.trim() }))
       .filter(t => t.text.length > 0)
       .slice(0, 10)
-    saveTasks(sanitized).then(() => window.close())
+    Promise.all([
+      saveTasks(sanitized),
+      saveSettings(settings),
+    ]).then(() => window.close())
   }
 
   return (
@@ -47,6 +53,19 @@ function App() {
       <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
         <button onClick={addTask}>追加</button>
         <button onClick={save} style={{ marginLeft: 'auto' }}>保存</button>
+      </div>
+
+      <hr style={{ margin: '16px 0' }} />
+      <div>
+        <label style={{ display: 'block', marginBottom: '8px' }}>リマインダー（分・未設定でOFF）</label>
+        <input
+          type="number"
+          min={1}
+          placeholder="例: 30"
+          value={settings.remindAfterMinutes ?? ''}
+          onChange={e => setSettings({ ...settings, remindAfterMinutes: e.target.value ? Number(e.target.value) : undefined })}
+          style={{ width: '120px', padding: '6px' }}
+        />
       </div>
     </div>
   )

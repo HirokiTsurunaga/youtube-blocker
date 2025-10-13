@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { useEffect, useState } from 'react';
 import './content.css';
-import { loadTasks, markShownThisSession, wasShownThisSession } from './utils/storage';
+import { loadTasks, markShownThisSession, wasShownThisSession, loadSettings, getLastShownAt, setLastShownAt } from './utils/storage';
 import type { Task } from './types/messages';
 
 // オーバーレイコンポーネント（React でタスクリストも描画）
@@ -68,11 +68,43 @@ function showBlocker() {
 
   // このセッションで表示済みとしてマーク
   markShownThisSession();
+  // 最終表示時刻を更新
+  setLastShownAt(Date.now());
 }
 
 // ページ読み込み時に表示
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', showBlocker);
+  document.addEventListener('DOMContentLoaded', async () => {
+    const settings = await loadSettings();
+    // 直ちに表示
+    showBlocker();
+    // リマインダー
+    if (settings.remindAfterMinutes && settings.remindAfterMinutes > 0) {
+      const delay = settings.remindAfterMinutes * 60 * 1000;
+      const last = await getLastShownAt();
+      const nextAt = (last ?? 0) + delay;
+      const wait = Math.max(0, nextAt - Date.now());
+      setTimeout(() => {
+        // セッションの1回制約より優先して、再度表示（セッション中でも再表示OK）
+        // セッションマークは更新しない
+        const container = document.getElementById('youtube-blocker-root');
+        if (!container) showBlocker();
+      }, wait);
+    }
+  });
 } else {
-  showBlocker();
+  (async () => {
+    const settings = await loadSettings();
+    showBlocker();
+    if (settings.remindAfterMinutes && settings.remindAfterMinutes > 0) {
+      const delay = settings.remindAfterMinutes * 60 * 1000;
+      const last = await getLastShownAt();
+      const nextAt = (last ?? 0) + delay;
+      const wait = Math.max(0, nextAt - Date.now());
+      setTimeout(() => {
+        const container = document.getElementById('youtube-blocker-root');
+        if (!container) showBlocker();
+      }, wait);
+    }
+  })();
 }
