@@ -11,5 +11,12 @@
     },
     "action": {
       "default_popup": "index.html"
-    }
+    },
+    "content_scripts": [
+      {
+        "matches": ["*://www.youtube.com/*"],
+        "js": ["src/content.tsx"],
+        "run_at": "document_end"
+      }
+    ]
   }

@@ -14,3 +14,12 @@ chrome.tabs.onUpdated.addListener((...args: any[]) => {
     // 将来的にここでポップアップを自動表示
   }
 });
+
+// メッセージを受け取る
+chrome.runtime.onMessage.addListener((message: any, sender: chrome.runtime.MessageSender) => {
+  if (message?.action === 'closeTab' && sender.tab?.id) {
+    chrome.tabs.remove(sender.tab.id);
+  }
+  // 非同期応答をしないので false（または undefined）を返す
+  return false;
+});
