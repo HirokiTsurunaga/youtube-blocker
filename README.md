@@ -1,11 +1,13 @@
 # YouTube Blocker (Chrome Extension)
 
-YouTube を開いた瞬間に「今日やること」を表示し、視聴を続けるか・やめるかを自分で選べるようにする Chrome 拡張（Manifest V3）です。Vite + React + TypeScript + crxjs で構築しています。
+YouTube を開いた瞬間に「代わりにやること」を表示し、視聴を続けるか・やめるかを自分で選べるようにする Chrome 拡張（Manifest V3）です。Vite + React + TypeScript + crxjs で構築しています。
 
 ## 機能
 - YouTube ドメインでオーバーレイ UI を表示
 - 「見る」: オーバーレイを閉じて視聴を継続
 - 「やめる」: バックグラウンドへメッセージを送り、現在タブを閉じる
+- **タスク編集**: ポップアップから「代わりにやること」のリストを編集・保存
+- **同期保存**: `chrome.storage.sync` に格納（利用不可の環境では `localStorage` に自動フォールバック）
 
 ## 技術スタック
 - React 19 + TypeScript
@@ -16,10 +18,12 @@ YouTube を開いた瞬間に「今日やること」を表示し、視聴を続
 ```
 / (repo root)
 ├─ src/
-│  ├─ App.tsx                # popup 用（開発用の最小ページ）
+│  ├─ App.tsx                # popup（タスク編集UI）
 │  ├─ background.ts          # MV3 Service Worker（メッセージ処理など）
 │  ├─ content.tsx            # YouTube ページ上にオーバーレイを描画
 │  ├─ content.css            # オーバーレイのスタイル
+│  ├─ utils/
+│  │  └─ storage.ts          # chrome.storage/localStorage ラッパ
 │  └─ types/
 │     └─ messages.ts         # 共有メッセージ型（ExtensionMessage など）
 ├─ manifest.json             # 開発用マニフェスト（crxjs が変換）
@@ -61,8 +65,9 @@ npm run build
 
 ## 仕組みの概要
 - `content.tsx` が YouTube ページにインジェクトされ、React でオーバーレイ UI を描画
-- 「やめる」クリックでバックグラウンドにメッセージ送信
-- `background.ts` が受信し、該当タブを閉じる
+- タスクリストは `utils/storage.ts` 経由で読み込み（`chrome.storage.sync` → フォールバック）
+- ポップアップ（`App.tsx`）でタスクを編集・保存
+- 「やめる」クリックでバックグラウンドにメッセージ送信、`background.ts` が現在タブを閉じる
 
 ```ts
 // content.tsx（一部）
@@ -86,7 +91,7 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 ```json
 {
   "manifest_version": 3,
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "storage"],
   "host_permissions": ["*://www.youtube.com/*"],
   "background": { "service_worker": "service-worker-loader.js", "type": "module" },
   "content_scripts": [
@@ -101,7 +106,7 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 `dist/manifest.json` は crxjs により自動生成されます。編集はリポジトリ直下の `manifest.json` に対して行ってください。
 
 ## カスタマイズ
-- **タスク文言の変更**: `src/content.tsx` のリスト要素を編集
+- **タスク文言の変更（推奨）**: ポップアップから編集して「保存」
 - **見た目の調整**: `src/content.css` を編集
 - **メッセージの拡張**: `src/types/messages.ts` に型を追加し、`background.ts`/`content.tsx` の送受信を対応させる
 
