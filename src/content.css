@@ -35,13 +35,17 @@
 	}
 }
 
-#youtube-blocker-overlay {
+dialog#youtube-blocker-overlay::backdrop {
+	background: rgba(0, 0, 0, 0.85);
+}
+
+dialog#youtube-blocker-overlay {
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	background-color: rgba(0, 0, 0, 0.95);
+	background-color: transparent;
 	z-index: 999999;
 	display: flex;
 	justify-content: center;

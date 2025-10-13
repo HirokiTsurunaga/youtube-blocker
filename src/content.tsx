@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './content.css';
 import { loadTasks, markShownThisSession, wasShownThisSession, loadSettings, getLastShownAt, setLastShownAt, DEFAULT_TASKS } from './utils/storage';
 import type { Task } from './types/domain';
@@ -7,6 +7,7 @@ import type { Task } from './types/domain';
 // オーバーレイコンポーネント（React でタスクリストも描画）
 function BlockerOverlay() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
     loadTasks()
@@ -17,20 +18,20 @@ function BlockerOverlay() {
       });
   }, []);
 
+  // dialog をモーダルで開き、閉じたらクリーンアップ
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        const container = document.getElementById('youtube-blocker-root');
-        if (container) container.remove();
-      }
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    const onClose = () => {
+      const container = document.getElementById('youtube-blocker-root');
+      if (container) container.remove();
     };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    dialog?.addEventListener('close', onClose);
+    return () => dialog?.removeEventListener('close', onClose);
   }, []);
 
   const handleWatch = () => {
-    const container = document.getElementById('youtube-blocker-root');
-    if (container) container.remove();
+    dialogRef.current?.close();
   };
 
   const handleCancel = () => {
@@ -38,7 +39,7 @@ function BlockerOverlay() {
   };
 
   return (
-    <div id="youtube-blocker-overlay" role="dialog" aria-labelledby="blocker-title" aria-modal="true">
+    <dialog ref={dialogRef} id="youtube-blocker-overlay" aria-labelledby="blocker-title">
       <div className="youtube-blocker-card">
         <h1 id="blocker-title" className="youtube-blocker-title">代わりにやること</h1>
         <ul className="youtube-blocker-list">
@@ -54,7 +55,7 @@ function BlockerOverlay() {
           <button onClick={handleCancel} className="youtube-blocker-btn cancel">やめる</button>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }
 
