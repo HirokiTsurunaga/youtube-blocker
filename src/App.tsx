@@ -1,7 +1,6 @@
 import './App.css'
 
 function App() {
-  // ボタンの動作もここ
   const handleWatch = () => {
     window.close();
   };
@@ -14,7 +13,6 @@ function App() {
     });
   };
 
-  // UIもここ
   return (
     <div style={{ width: '400px', padding: '30px' }}>
       <h1>今日やること</h1>
