@@ -1,0 +1,57 @@
+#youtube-blocker-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.95);
+	z-index: 999999;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+}
+
+.youtube-blocker-card {
+	background-color: #1a1a1a;
+	padding: 40px;
+	border-radius: 10px;
+	max-width: 500px;
+}
+
+.youtube-blocker-title {
+	font-size: 32px;
+	margin-bottom: 20px;
+}
+
+.youtube-blocker-list {
+	list-style: none;
+	padding: 0;
+	margin-bottom: 30px;
+	font-size: 18px;
+}
+
+.youtube-blocker-actions {
+	display: flex;
+	gap: 15px;
+}
+
+.youtube-blocker-btn {
+	flex: 1;
+	padding: 15px;
+	font-size: 18px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.youtube-blocker-btn.watch {
+	background-color: #333;
+	color: #fff;
+	border: 2px solid #fff;
+}
+
+.youtube-blocker-btn.cancel {
+	background-color: #ff0000;
+	color: #fff;
+	border: none;
+}

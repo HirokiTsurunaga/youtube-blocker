@@ -16,8 +16,10 @@ chrome.tabs.onUpdated.addListener((...args: any[]) => {
 });
 
 // メッセージを受け取る
-chrome.runtime.onMessage.addListener((message: any, sender: chrome.runtime.MessageSender) => {
-  if (message?.action === 'closeTab' && sender.tab?.id) {
+import type { ExtensionMessage } from './types/messages';
+
+chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender: chrome.runtime.MessageSender) => {
+  if (message.action === 'closeTab' && sender.tab?.id) {
     chrome.tabs.remove(sender.tab.id);
   }
   // 非同期応答をしないので false（または undefined）を返す
