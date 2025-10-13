@@ -3,7 +3,7 @@
     "name": "YouTube Blocker",
     "version": "1.0",
     "description": "YouTubeを開く前にやることを思い出させる",
-    "permissions": ["tabs"],
+    "permissions": ["tabs", "storage"],
     "host_permissions": ["*://www.youtube.com/*"],
     "background": {
       "service_worker": "src/background.ts",

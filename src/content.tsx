@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import './content.css';
-import type { ExtensionMessage } from './types/messages';
+import { DEFAULT_TASKS, loadTasks } from './utils/storage';
 
 // オーバーレイコンポーネント
 function BlockerOverlay() {
@@ -14,20 +14,14 @@ function BlockerOverlay() {
 
   const handleCancel = () => {
     // background scriptにメッセージを送る
-    const msg: ExtensionMessage = { action: 'closeTab' };
-    chrome.runtime.sendMessage(msg);
+    chrome.runtime.sendMessage({ action: 'closeTab' });
   };
 
   return (
     <div id="youtube-blocker-overlay">
       <div className="youtube-blocker-card">
-        <h1 className="youtube-blocker-title">今日やること</h1>
-        <ul className="youtube-blocker-list">
-          <li style={{ padding: '12px 0' }}>・ウォーキング(30分)</li>
-          <li style={{ padding: '12px 0' }}>・ジムに行く(1時間)</li>
-          <li style={{ padding: '12px 0' }}>・本を読む(1時間)</li>
-          <li style={{ padding: '12px 0' }}>・コードを書く(30分)</li>
-        </ul>
+        <h1 className="youtube-blocker-title">代わりにやること</h1>
+        <ul className="youtube-blocker-list" id="youtube-blocker-list"></ul>
         <p style={{ 
           fontSize: '24px', 
           fontWeight: 'bold',
@@ -60,6 +54,19 @@ function showBlocker() {
   // Reactでレンダリング
   const root = createRoot(overlayDiv);
   root.render(<BlockerOverlay />);
+
+  // タスクを storage から読み込み描画（拡張外でも動作）
+  loadTasks().then((tasks = DEFAULT_TASKS) => {
+    const ul = document.getElementById('youtube-blocker-list');
+    if (!ul) return;
+    ul.innerHTML = '';
+    for (const t of tasks) {
+      const li = document.createElement('li');
+      li.style.padding = '12px 0';
+      li.textContent = `・${t.text}`;
+      ul.appendChild(li);
+    }
+  });
 }
 
 // ページ読み込み時に表示
