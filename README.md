@@ -145,3 +145,6 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 
 ## ライセンス
 パーソナルユース想定。必要に応じて追記してください。
+
+## プライバシー
+本拡張のプライバシーポリシーは `PRIVACY.md` をご覧ください。
