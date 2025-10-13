@@ -127,6 +127,7 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 - 設定場所: ポップアップの「テーマ」セレクトで選択
 - 仕組み: `#youtube-blocker-root[data-yb-theme="..."]` に応じて CSS 変数を切替（`src/content.css`）。
   - `auto` は OS の `prefers-color-scheme` を用いたダーク優先に対応
+  - ポップアップは選択直後に即時プレビューされます（保存有無に関わらず）
 
 ### 表示頻度
 - 1セッションにつき1回のみ表示（`sessionStorage` にマーク）
