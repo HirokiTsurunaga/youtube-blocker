@@ -1,19 +1,34 @@
 import { createRoot } from 'react-dom/client';
+import { useEffect, useState } from 'react';
 import './content.css';
-import { DEFAULT_TASKS, loadTasks } from './utils/storage';
+import { loadTasks, markShownThisSession, wasShownThisSession } from './utils/storage';
+import type { Task } from './types/messages';
 
-// オーバーレイコンポーネント
+// オーバーレイコンポーネント（React でタスクリストも描画）
 function BlockerOverlay() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    loadTasks().then(setTasks);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        const container = document.getElementById('youtube-blocker-root');
+        if (container) container.remove();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
   const handleWatch = () => {
-    // オーバーレイを削除
-    const overlay = document.getElementById('youtube-blocker-overlay');
-    if (overlay) {
-      overlay.remove();
-    }
+    const container = document.getElementById('youtube-blocker-root');
+    if (container) container.remove();
   };
 
   const handleCancel = () => {
-    // background scriptにメッセージを送る
     chrome.runtime.sendMessage({ action: 'closeTab' });
   };
 
@@ -21,13 +36,12 @@ function BlockerOverlay() {
     <div id="youtube-blocker-overlay">
       <div className="youtube-blocker-card">
         <h1 className="youtube-blocker-title">代わりにやること</h1>
-        <ul className="youtube-blocker-list" id="youtube-blocker-list"></ul>
-        <p style={{ 
-          fontSize: '24px', 
-          fontWeight: 'bold',
-          marginBottom: '30px',
-          textAlign: 'center'
-        }}>
+        <ul className="youtube-blocker-list">
+          {tasks.map(task => (
+            <li key={task.id} style={{ padding: '12px 0' }}>・{task.text}</li>
+          ))}
+        </ul>
+        <p style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '30px', textAlign: 'center' }}>
           それでも見る？
         </p>
         <div className="youtube-blocker-actions">
@@ -41,32 +55,19 @@ function BlockerOverlay() {
 
 // オーバーレイを表示
 function showBlocker() {
-  // 既に表示されていたら何もしない
-  if (document.getElementById('youtube-blocker-overlay')) {
-    return;
-  }
+  // 既に表示済み or このセッションで一度表示しているなら何もしない
+  if (document.getElementById('youtube-blocker-root')) return;
+  if (wasShownThisSession()) return;
 
-  // オーバーレイ用のdivを作成
-  const overlayDiv = document.createElement('div');
-  overlayDiv.id = 'youtube-blocker-overlay';
-  document.body.appendChild(overlayDiv);
+  const container = document.createElement('div');
+  container.id = 'youtube-blocker-root';
+  document.body.appendChild(container);
 
-  // Reactでレンダリング
-  const root = createRoot(overlayDiv);
+  const root = createRoot(container);
   root.render(<BlockerOverlay />);
 
-  // タスクを storage から読み込み描画（拡張外でも動作）
-  loadTasks().then((tasks = DEFAULT_TASKS) => {
-    const ul = document.getElementById('youtube-blocker-list');
-    if (!ul) return;
-    ul.innerHTML = '';
-    for (const t of tasks) {
-      const li = document.createElement('li');
-      li.style.padding = '12px 0';
-      li.textContent = `・${t.text}`;
-      ul.appendChild(li);
-    }
-  });
+  // このセッションで表示済みとしてマーク
+  markShownThisSession();
 }
 
 // ページ読み込み時に表示

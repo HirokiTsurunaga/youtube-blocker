@@ -110,6 +110,10 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 - **見た目の調整**: `src/content.css` を編集
 - **メッセージの拡張**: `src/types/messages.ts` に型を追加し、`background.ts`/`content.tsx` の送受信を対応させる
 
+### 表示頻度
+- 1セッションにつき1回のみ表示（`sessionStorage` にマーク）
+- 毎回表示したい場合は実装を調整してください（`utils/storage.ts` の `wasShownThisSession` を参照）
+
 ## よくある問題
 - サービスワーカー登録失敗（Status code: 3）/ CORS エラー
   - 開発モードでローカル `http://localhost:5173` を import すると CORS で失敗します。本プロジェクトでは「常に `npm run build` して `dist/` を読み込む」方針です。

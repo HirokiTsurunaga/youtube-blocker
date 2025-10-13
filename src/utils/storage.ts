@@ -54,4 +54,13 @@ export async function saveTasks(tasks: Task[]): Promise<void> {
 
 export { DEFAULT_TASKS }
 
+// 1セッション1回の表示制御（最小実装）
+export function markShownThisSession(): void {
+	try { sessionStorage.setItem('yb_shown', '1'); } catch {}
+}
+
+export function wasShownThisSession(): boolean {
+	try { return sessionStorage.getItem('yb_shown') === '1'; } catch { return false; }
+}
+
 
