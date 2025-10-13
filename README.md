@@ -6,6 +6,7 @@ YouTube を開いた瞬間に「代わりにやること」を表示し、視聴
 - YouTube ドメインでオーバーレイ UI を表示
 - 「見る」: オーバーレイを閉じて視聴を継続
 - 「やめる」: バックグラウンドへメッセージを送り、現在タブを閉じる
+- リマインダー（任意）: 指定した分後に再度オーバーレイを表示
 - **タスク編集**: ポップアップから「代わりにやること」のリストを編集・保存
 - **同期保存**: `chrome.storage.sync` に格納（利用不可の環境では `localStorage` に自動フォールバック）
 
@@ -113,6 +114,12 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 ### 表示頻度
 - 1セッションにつき1回のみ表示（`sessionStorage` にマーク）
 - 毎回表示したい場合は実装を調整してください（`utils/storage.ts` の `wasShownThisSession` を参照）
+
+### リマインダー
+- 設定場所: ポップアップの「リマインダー（分）」入力欄。空欄なら OFF。
+- 仕組み: 最終表示時刻（`lastShownAt`）と設定分数から、次回表示までの待機時間を算出して再度オーバーレイを表示します。
+  - `chrome.storage.local` に `lastShownAt` を保存（利用不可環境では `localStorage`）。
+  - セッション1回制限とは独立して動作し、同一タブ内でも指定時間後に再表示されます。
 
 ## よくある問題
 - サービスワーカー登録失敗（Status code: 3）/ CORS エラー
