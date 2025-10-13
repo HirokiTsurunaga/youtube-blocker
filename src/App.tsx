@@ -1,12 +1,12 @@
 import './App.css'
 import { useEffect, useState } from 'react'
-import type { Task } from './types/messages'
+import type { Task } from './types/domain'
 import { loadTasks, saveTasks, loadSettings, saveSettings } from './utils/storage'
-import type { Settings } from './types/messages'
+import type { Settings } from './types/domain'
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([])
-  const [settings, setSettings] = useState<Settings>({ showOn: 'once_per_session', remindAfterMinutes: undefined })
+  const [settings, setSettings] = useState<Settings>({ showOn: 'once_per_session', remindAfterMinutes: undefined, theme: 'auto' })
 
   useEffect(() => {
     loadTasks().then(setTasks)
@@ -66,6 +66,19 @@ function App() {
           onChange={e => setSettings({ ...settings, remindAfterMinutes: e.target.value ? Number(e.target.value) : undefined })}
           style={{ width: '120px', padding: '6px' }}
         />
+      </div>
+
+      <div style={{ marginTop: '12px' }}>
+        <label style={{ display: 'block', marginBottom: '8px' }}>テーマ</label>
+        <select
+          value={settings.theme ?? 'auto'}
+          onChange={e => setSettings({ ...settings, theme: e.target.value as Settings['theme'] })}
+          style={{ padding: '6px' }}
+        >
+          <option value="auto">自動（OS設定に追従）</option>
+          <option value="light">ライト</option>
+          <option value="dark">ダーク</option>
+        </select>
       </div>
     </div>
   )

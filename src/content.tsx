@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { useEffect, useState } from 'react';
 import './content.css';
 import { loadTasks, markShownThisSession, wasShownThisSession, loadSettings, getLastShownAt, setLastShownAt } from './utils/storage';
-import type { Task } from './types/messages';
+import type { Task } from './types/domain';
 
 // オーバーレイコンポーネント（React でタスクリストも描画）
 function BlockerOverlay() {
@@ -54,13 +54,15 @@ function BlockerOverlay() {
 }
 
 // オーバーレイを表示
-function showBlocker() {
+function showBlocker(theme?: 'auto' | 'light' | 'dark') {
   // 既に表示済み or このセッションで一度表示しているなら何もしない
   if (document.getElementById('youtube-blocker-root')) return;
   if (wasShownThisSession()) return;
 
   const container = document.createElement('div');
   container.id = 'youtube-blocker-root';
+  // テーマ属性（指定がなければ auto）
+  container.setAttribute('data-yb-theme', theme ?? 'auto');
   document.body.appendChild(container);
 
   const root = createRoot(container);
@@ -76,8 +78,8 @@ function showBlocker() {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', async () => {
     const settings = await loadSettings();
-    // 直ちに表示
-    showBlocker();
+    // 直ちに表示（テーマ適用）
+    showBlocker(settings.theme);
     // リマインダー
     if (settings.remindAfterMinutes && settings.remindAfterMinutes > 0) {
       const delay = settings.remindAfterMinutes * 60 * 1000;
@@ -88,14 +90,14 @@ if (document.readyState === 'loading') {
         // セッションの1回制約より優先して、再度表示（セッション中でも再表示OK）
         // セッションマークは更新しない
         const container = document.getElementById('youtube-blocker-root');
-        if (!container) showBlocker();
+        if (!container) showBlocker(settings.theme);
       }, wait);
     }
   });
 } else {
   (async () => {
     const settings = await loadSettings();
-    showBlocker();
+    showBlocker(settings.theme);
     if (settings.remindAfterMinutes && settings.remindAfterMinutes > 0) {
       const delay = settings.remindAfterMinutes * 60 * 1000;
       const last = await getLastShownAt();
@@ -103,7 +105,7 @@ if (document.readyState === 'loading') {
       const wait = Math.max(0, nextAt - Date.now());
       setTimeout(() => {
         const container = document.getElementById('youtube-blocker-root');
-        if (!container) showBlocker();
+        if (!container) showBlocker(settings.theme);
       }, wait);
     }
   })();

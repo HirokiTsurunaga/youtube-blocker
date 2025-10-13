@@ -15,7 +15,7 @@ chrome.tabs.onUpdated.addListener((_tabId, changeInfo, _tab) => {
 });
 
 // メッセージを受け取る
-import type { ExtensionMessage } from './types/messages';
+import type { ExtensionMessage } from './types/domain';
 
 chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender: chrome.runtime.MessageSender) => {
   if (message.action === 'closeTab' && sender.tab?.id) {

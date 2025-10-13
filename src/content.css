@@ -1,3 +1,40 @@
+/* Theme tokens */
+:root {
+	--yb-bg: #1a1a1a;
+	--yb-text: #ffffff;
+	--yb-btn-bg: #333;
+	--yb-accent: #ff0000;
+	--yb-border: #ffffff;
+}
+
+/* dark theme overrides */
+[data-yb-theme="dark"] {
+	--yb-bg: #1a1a1a;
+	--yb-text: #ffffff;
+	--yb-btn-bg: #333;
+	--yb-accent: #ff3b3b;
+	--yb-border: #ffffff;
+}
+
+/* light theme overrides */
+[data-yb-theme="light"] {
+	--yb-bg: #ffffff;
+	--yb-text: #111111;
+	--yb-btn-bg: #f2f2f2;
+	--yb-accent: #d32f2f;
+	--yb-border: #111111;
+}
+
+@media (prefers-color-scheme: dark) {
+	[data-yb-theme="auto"] {
+		--yb-bg: #1a1a1a;
+		--yb-text: #ffffff;
+		--yb-btn-bg: #333;
+		--yb-accent: #ff3b3b;
+		--yb-border: #ffffff;
+	}
+}
+
 #youtube-blocker-overlay {
 	position: fixed;
 	top: 0;
@@ -9,11 +46,11 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	color: white;
+	color: var(--yb-text);
 }
 
 .youtube-blocker-card {
-	background-color: #1a1a1a;
+	background-color: var(--yb-bg);
 	padding: 40px;
 	border-radius: 10px;
 	max-width: 500px;
@@ -45,13 +82,13 @@
 }
 
 .youtube-blocker-btn.watch {
-	background-color: #333;
-	color: #fff;
-	border: 2px solid #fff;
+	background-color: var(--yb-btn-bg);
+	color: var(--yb-text);
+	border: 2px solid var(--yb-border);
 }
 
 .youtube-blocker-btn.cancel {
-	background-color: #ff0000;
-	color: #fff;
+	background-color: var(--yb-accent);
+	color: var(--yb-text);
 	border: none;
 }

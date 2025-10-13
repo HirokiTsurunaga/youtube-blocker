@@ -26,7 +26,7 @@ YouTube を開いた瞬間に「代わりにやること」を表示し、視聴
 │  ├─ utils/
 │  │  └─ storage.ts          # chrome.storage/localStorage ラッパ
 │  └─ types/
-│     └─ messages.ts         # 共有メッセージ型（ExtensionMessage など）
+│     └─ domain.ts           # ドメイン型（Task/Settings, メッセージ型）
 ├─ manifest.json             # 開発用マニフェスト（crxjs が変換）
 ├─ vite.config.ts            # Vite + crxjs 設定
 └─ dist/                     # ビルド成果物（Chrome で読み込む）
@@ -72,14 +72,14 @@ npm run build
 
 ```ts
 // content.tsx（一部）
-import type { ExtensionMessage } from './types/messages';
+import type { ExtensionMessage } from './types/domain';
 const msg: ExtensionMessage = { action: 'closeTab' };
 chrome.runtime.sendMessage(msg);
 ```
 
 ```ts
 // background.ts（一部）
-import type { ExtensionMessage } from './types/messages';
+import type { ExtensionMessage } from './types/domain';
 chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
   if (message.action === 'closeTab' && sender.tab?.id) {
     chrome.tabs.remove(sender.tab.id);
@@ -109,7 +109,12 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 ## カスタマイズ
 - **タスク文言の変更（推奨）**: ポップアップから編集して「保存」
 - **見た目の調整**: `src/content.css` を編集
-- **メッセージの拡張**: `src/types/messages.ts` に型を追加し、`background.ts`/`content.tsx` の送受信を対応させる
+- **メッセージの拡張**: `src/types/domain.ts` に型を追加し、`background.ts`/`content.tsx` の送受信を対応させる
+
+### テーマ（ライト/ダーク/自動）
+- 設定場所: ポップアップの「テーマ」セレクトで選択
+- 仕組み: `#youtube-blocker-root[data-yb-theme="..."]` に応じて CSS 変数を切替（`src/content.css`）。
+  - `auto` は OS の `prefers-color-scheme` を用いたダーク優先に対応
 
 ### 表示頻度
 - 1セッションにつき1回のみ表示（`sessionStorage` にマーク）

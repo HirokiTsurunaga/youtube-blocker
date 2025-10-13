@@ -1,4 +1,4 @@
-import type { Task, Settings } from '../types/messages'
+import type { Task, Settings } from '../types/domain'
 
 const DEFAULT_TASKS: Task[] = [
 	{ id: 'default-1', text: 'ウォーキング(30分)' },
@@ -65,7 +65,7 @@ export function wasShownThisSession(): boolean {
 
 // 設定の読み書き（リマインダー等）
 export async function loadSettings(): Promise<Settings> {
-	const defaults: Settings = { showOn: 'once_per_session', remindAfterMinutes: undefined };
+	const defaults: Settings = { showOn: 'once_per_session', remindAfterMinutes: undefined, theme: 'auto' };
 	try {
 		if (typeof chrome !== 'undefined' && chrome?.storage?.sync) {
 			return await new Promise<Settings>((resolve) => {
