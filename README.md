@@ -18,7 +18,10 @@ YouTube を開いた瞬間に「今日やること」を表示し、視聴を続
 ├─ src/
 │  ├─ App.tsx                # popup 用（開発用の最小ページ）
 │  ├─ background.ts          # MV3 Service Worker（メッセージ処理など）
-│  └─ content.tsx            # YouTube ページ上にオーバーレイを描画
+│  ├─ content.tsx            # YouTube ページ上にオーバーレイを描画
+│  ├─ content.css            # オーバーレイのスタイル
+│  └─ types/
+│     └─ messages.ts         # 共有メッセージ型（ExtensionMessage など）
 ├─ manifest.json             # 開発用マニフェスト（crxjs が変換）
 ├─ vite.config.ts            # Vite + crxjs 設定
 └─ dist/                     # ビルド成果物（Chrome で読み込む）
@@ -63,13 +66,16 @@ npm run build
 
 ```ts
 // content.tsx（一部）
-chrome.runtime.sendMessage({ action: 'closeTab' });
+import type { ExtensionMessage } from './types/messages';
+const msg: ExtensionMessage = { action: 'closeTab' };
+chrome.runtime.sendMessage(msg);
 ```
 
 ```ts
 // background.ts（一部）
-chrome.runtime.onMessage.addListener((message, sender) => {
-  if (message?.action === 'closeTab' && sender.tab?.id) {
+import type { ExtensionMessage } from './types/messages';
+chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
+  if (message.action === 'closeTab' && sender.tab?.id) {
     chrome.tabs.remove(sender.tab.id);
   }
   return false; // 非同期応答なし
@@ -93,6 +99,11 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 }
 ```
 `dist/manifest.json` は crxjs により自動生成されます。編集はリポジトリ直下の `manifest.json` に対して行ってください。
+
+## カスタマイズ
+- **タスク文言の変更**: `src/content.tsx` のリスト要素を編集
+- **見た目の調整**: `src/content.css` を編集
+- **メッセージの拡張**: `src/types/messages.ts` に型を追加し、`background.ts`/`content.tsx` の送受信を対応させる
 
 ## よくある問題
 - サービスワーカー登録失敗（Status code: 3）/ CORS エラー
