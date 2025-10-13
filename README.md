@@ -64,6 +64,18 @@ npm run build
 
 変更したら再度 `npm run build` → 拡張を「更新」してください。
 
+## E2E テスト（Playwright）
+インストール済みです。ネットワークに依存するため、安定性が必要ならモックページに差し替えてください。
+
+```bash
+npm run test:e2e
+```
+
+テスト内容:
+- YouTube でオーバーレイが表示される
+- ESC で閉じられる
+- 同セッションのリロードでは再表示されない
+
 ## 仕組みの概要
 - `content.tsx` が YouTube ページにインジェクトされ、React でオーバーレイ UI を描画
 - タスクリストは `utils/storage.ts` 経由で読み込み（`chrome.storage.sync` → フォールバック）
