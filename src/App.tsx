@@ -1,4 +1,5 @@
 import './App.css'
+import './content.css'
 import { useEffect, useState } from 'react'
 import type { Task } from './types/domain'
 import { loadTasks, saveTasks, loadSettings, saveSettings } from './utils/storage'
@@ -12,6 +13,16 @@ function App() {
     loadTasks().then(setTasks)
     loadSettings().then(setSettings)
   }, [])
+
+  // テーマ即時反映（ポップアップ内でのプレビュー）
+  useEffect(() => {
+    const theme = settings.theme ?? 'auto'
+    document.documentElement.setAttribute('data-yb-theme', theme)
+    return () => {
+      // 破棄時に元へ戻す必要はないが、念のため削除
+      document.documentElement.removeAttribute('data-yb-theme')
+    }
+  }, [settings.theme])
 
   const addTask = () => {
     setTasks([...tasks, { id: crypto.randomUUID(), text: '' }])
@@ -37,7 +48,7 @@ function App() {
   }
 
   return (
-    <div style={{ width: '420px', padding: '20px' }}>
+    <div style={{ width: '420px', padding: '20px', backgroundColor: 'var(--yb-bg)', color: 'var(--yb-text)' }}>
       <h1 style={{ marginBottom: '12px' }}>代わりにやること（編集）</h1>
       {tasks.map(task => (
         <div key={task.id} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
