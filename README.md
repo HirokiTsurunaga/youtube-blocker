@@ -2,6 +2,12 @@
 
 YouTube を開いた瞬間に「代わりにやること」を表示し、視聴を続けるか・やめるかを自分で選べるようにする Chrome 拡張（Manifest V3）です。Vite + React + TypeScript + crxjs で構築しています。
 
+## 📸 スクリーンショット
+
+![オーバーレイ表示](screenshots/overlay-main.png)
+
+*YouTubeを開くと自動的に表示され、本当に見るべきか考える時間を与えてくれます*
+
 ## 機能
 - YouTube ドメインでオーバーレイ UI を表示
 - 「見る」: オーバーレイを閉じて視聴を継続
