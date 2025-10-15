@@ -150,7 +150,7 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
   - 開発モードでローカル `http://localhost:5173` を import すると CORS で失敗します。本プロジェクトでは「常に `npm run build` して `dist/` を読み込む」方針です。
 
 ## ライセンス
-パーソナルユース想定。必要に応じて追記してください。
+MITライセンス
 
 ## プライバシー
 本拡張のプライバシーポリシーは `PRIVACY.md` をご覧ください。
