@@ -153,4 +153,4 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 MITライセンス
 
 ## プライバシー
-本拡張のプライバシーポリシーは `PRIVACY.md` をご覧ください。
+本拡張のプライバシーポリシーは [PRIVACY.md](PRIVACY.md) をご覧ください。
