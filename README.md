@@ -5,6 +5,8 @@ YouTube を開いた瞬間に「代わりにやること」を表示し、視聴
 ## 📸 スクリーンショット
 
 ![オーバーレイ表示](screenshots/overlay-main.png)
+![ポップアップ](screenshots/popup.png)
+![ライトモード](screenshots/lightmode.png)
 
 *YouTubeを開くと自動的に表示され、本当に見るべきか考える時間を与えてくれます*
 
