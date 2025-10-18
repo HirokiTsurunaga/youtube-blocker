@@ -17,6 +17,7 @@ YouTube を開いた瞬間に「代わりにやること」を表示し、視聴
 - リマインダー（任意）: 指定した分後に再度オーバーレイを表示
 - **タスク編集**: ポップアップから「代わりにやること」のリストを編集・保存
 - **同期保存**: `chrome.storage.sync` に格納（利用不可の環境では `localStorage` に自動フォールバック）
+- **多言語対応**: 10言語に対応（自動検出 + 手動切替可能）
 
 ## 技術スタック
 - React 19 + TypeScript
@@ -31,6 +32,8 @@ YouTube を開いた瞬間に「代わりにやること」を表示し、視聴
 │  ├─ background.ts          # MV3 Service Worker（メッセージ処理など）
 │  ├─ content.tsx            # YouTube ページ上にオーバーレイを描画
 │  ├─ content.css            # オーバーレイのスタイル
+│  ├─ i18n/
+│  │  └─ translations.ts     # 多言語翻訳データ（10言語対応）
 │  ├─ utils/
 │  │  └─ storage.ts          # chrome.storage/localStorage ラッパ
 │  └─ types/
@@ -146,6 +149,24 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender) => {
 - 仕組み: 最終表示時刻（`lastShownAt`）と設定分数から、次回表示までの待機時間を算出して再度オーバーレイを表示します。
   - `chrome.storage.local` に `lastShownAt` を保存（利用不可環境では `localStorage`）。
   - セッション1回制限とは独立して動作し、同一タブ内でも指定時間後に再表示されます。
+
+### 多言語対応（i18n）
+- **対応言語**: 10言語
+  - English (en) - デフォルト
+  - 日本語 (ja)
+  - Español (es)
+  - Português (pt)
+  - हिन्दी (hi)
+  - 简体中文 (zh-CN)
+  - Français (fr)
+  - Deutsch (de)
+  - 한국어 (ko)
+  - Русский (ru)
+- **自動検出**: 初回起動時にブラウザの言語設定（`navigator.language`）を検出し、対応言語を自動選択
+- **手動切替**: ポップアップの「言語」セレクトで任意の言語に変更可能
+- **翻訳範囲**: ポップアップとオーバーレイの全UIテキスト、デフォルトタスク
+- **フォールバック**: 未対応言語は英語にフォールバック
+- **実装場所**: `src/i18n/translations.ts` に全翻訳データを集約
 
 ## よくある問題
 - サービスワーカー登録失敗（Status code: 3）/ CORS エラー
