@@ -92,7 +92,7 @@ function App() {
   }
 
   const inputStyle = {
-    padding: '10px 12px',
+    padding: '8px 10px',
     borderRadius: 8,
     border: '1px solid rgba(128, 128, 128, 0.3)',
     background: 'var(--yb-bg)',
@@ -104,7 +104,7 @@ function App() {
 
   const labelStyle = {
     display: 'block',
-    marginBottom: '8px',
+    marginBottom: '6px',
     fontSize: '13px',
     fontWeight: '500' as const,
     color: 'var(--yb-text)',
@@ -112,14 +112,14 @@ function App() {
   }
 
   return (
-    <div style={{ width: '420px', padding: '24px', backgroundColor: 'var(--yb-bg)', color: 'var(--yb-text)', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
-      <h1 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: '600' }}>
+    <div style={{ width: '420px', padding: '20px', backgroundColor: 'var(--yb-bg)', color: 'var(--yb-text)', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+      <h1 style={{ marginBottom: '16px', fontSize: '20px', fontWeight: '600' }}>
         代わりにやること
-        <div style={{ fontSize: '12px', fontWeight: '400', opacity: 0.6, marginTop: '4px' }}>設定</div>
+        <div style={{ fontSize: '12px', fontWeight: '400', opacity: 0.6, marginTop: '2px' }}>設定</div>
       </h1>
       
       {tasks.map(task => (
-        <div key={task.id} style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+        <div key={task.id} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
           <input
             value={task.text}
             onChange={(e) => updateTask(task.id, e.target.value)}
@@ -132,8 +132,8 @@ function App() {
             onClick={() => removeTask(task.id)} 
             aria-label="削除"
             style={{
-              minWidth: 44,
-              height: 44,
+              minWidth: 38,
+              height: 38,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -142,7 +142,7 @@ function App() {
               background: 'transparent',
               color: 'var(--yb-text)',
               cursor: 'pointer',
-              fontSize: '18px',
+              fontSize: '16px',
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
@@ -161,7 +161,7 @@ function App() {
         </div>
       ))}
       
-      <div style={{ display: 'flex', gap: '8px', marginTop: '16px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '8px', marginTop: '12px', alignItems: 'center' }}>
         <IconButton onClick={addTask} label="追加" title="追加">
           <PlusIcon />
         </IconButton>
@@ -171,9 +171,9 @@ function App() {
         </IconButton>
       </div>
 
-      <hr style={{ margin: '24px 0', border: 'none', borderTop: '1px solid rgba(128, 128, 128, 0.2)' }} />
+      <hr style={{ margin: '16px 0', border: 'none', borderTop: '1px solid rgba(128, 128, 128, 0.2)' }} />
       
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: '14px' }}>
         <label style={labelStyle}>リマインダー（分・未設定でOFF）</label>
         <input
           type="number"
