@@ -2,41 +2,36 @@
 :root {
 	--yb-bg: #1a1a1a;
 	--yb-text: #ffffff;
-	--yb-btn-bg: #333;
-	--yb-accent: #ff0000;
-	--yb-border: #ffffff;
 }
 
 /* dark theme overrides */
 [data-yb-theme="dark"] {
 	--yb-bg: #1a1a1a;
 	--yb-text: #ffffff;
-	--yb-btn-bg: #333;
-	--yb-accent: #ff3b3b;
-	--yb-border: #ffffff;
 }
 
 /* light theme overrides */
 [data-yb-theme="light"] {
 	--yb-bg: #ffffff;
 	--yb-text: #111111;
-	--yb-btn-bg: #f2f2f2;
-	--yb-accent: #d32f2f;
-	--yb-border: #111111;
 }
 
 @media (prefers-color-scheme: dark) {
 	[data-yb-theme="auto"] {
 		--yb-bg: #1a1a1a;
 		--yb-text: #ffffff;
-		--yb-btn-bg: #333;
-		--yb-accent: #ff3b3b;
-		--yb-border: #ffffff;
+	}
+}
+
+@media (prefers-color-scheme: light) {
+	[data-yb-theme="auto"] {
+		--yb-bg: #ffffff;
+		--yb-text: #111111;
 	}
 }
 
 dialog#youtube-blocker-overlay::backdrop {
-	background: rgba(0, 0, 0, 0.85);
+	background: rgba(0, 0, 0, 0.92);
 }
 
 dialog#youtube-blocker-overlay {
@@ -46,53 +41,76 @@ dialog#youtube-blocker-overlay {
 	width: 100vw;
 	height: 100vh;
 	background-color: transparent;
+	border: none;
+	padding: 0;
+	margin: 0;
 	z-index: 999999;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	color: var(--yb-text);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .youtube-blocker-card {
 	background-color: var(--yb-bg);
-	padding: 40px;
-	border-radius: 10px;
-	max-width: 500px;
+	padding: 48px;
+	border-radius: 16px;
+	max-width: 560px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .youtube-blocker-title {
-	font-size: 32px;
-	margin-bottom: 20px;
+	font-size: 28px;
+	font-weight: 600;
+	margin-bottom: 24px;
+	letter-spacing: -0.3px;
 }
 
 .youtube-blocker-list {
 	list-style: none;
 	padding: 0;
-	margin-bottom: 30px;
-	font-size: 18px;
+	margin-bottom: 32px;
+	font-size: 16px;
+	line-height: 1.6;
+}
+
+.youtube-blocker-list li {
+	padding: 10px 0;
+	opacity: 0.9;
 }
 
 .youtube-blocker-actions {
 	display: flex;
-	gap: 15px;
+	gap: 12px;
 }
 
 .youtube-blocker-btn {
 	flex: 1;
-	padding: 15px;
-	font-size: 18px;
+	padding: 14px 24px;
+	font-size: 16px;
+	font-weight: 500;
 	cursor: pointer;
-	border-radius: 5px;
+	border-radius: 8px;
+	transition: all 0.2s ease;
+	border: none;
 }
 
 .youtube-blocker-btn.watch {
-	background-color: var(--yb-btn-bg);
+	background-color: transparent;
 	color: var(--yb-text);
-	border: 2px solid var(--yb-border);
+	border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.youtube-blocker-btn.watch:hover {
+	background-color: rgba(128, 128, 128, 0.1);
 }
 
 .youtube-blocker-btn.cancel {
-	background-color: var(--yb-accent);
-	color: var(--yb-text);
-	border: none;
+	background-color: #FF3B30;
+	color: #ffffff;
+}
+
+.youtube-blocker-btn.cancel:hover {
+	background-color: #D32F2F;
 }

@@ -44,10 +44,16 @@ function BlockerOverlay() {
         <h1 id="blocker-title" className="youtube-blocker-title">代わりにやること</h1>
         <ul className="youtube-blocker-list">
           {tasks.map(task => (
-            <li key={task.id} style={{ padding: '12px 0' }}>・{task.text}</li>
+            <li key={task.id}>・{task.text}</li>
           ))}
         </ul>
-        <p style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '30px', textAlign: 'center' }}>
+        <p style={{ 
+          fontSize: '18px', 
+          fontWeight: '500', 
+          marginBottom: '24px', 
+          textAlign: 'center',
+          opacity: 0.9
+        }}>
           それでも見る？
         </p>
         <div className="youtube-blocker-actions">

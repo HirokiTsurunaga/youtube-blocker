@@ -91,21 +91,77 @@ function App() {
     ]).then(() => window.close())
   }
 
+  const inputStyle = {
+    padding: '10px 12px',
+    borderRadius: 8,
+    border: '1px solid rgba(128, 128, 128, 0.3)',
+    background: 'var(--yb-bg)',
+    color: 'var(--yb-text)',
+    fontSize: '14px',
+    outline: 'none',
+    transition: 'border-color 0.2s ease',
+  }
+
+  const labelStyle = {
+    display: 'block',
+    marginBottom: '8px',
+    fontSize: '13px',
+    fontWeight: '500' as const,
+    color: 'var(--yb-text)',
+    opacity: 0.8,
+  }
+
   return (
-    <div style={{ width: '420px', padding: '20px', backgroundColor: 'var(--yb-bg)', color: 'var(--yb-text)' }}>
-      <h1 style={{ marginBottom: '12px' }}>代わりにやること<br /><small>（設定）</small></h1>
+    <div style={{ width: '420px', padding: '24px', backgroundColor: 'var(--yb-bg)', color: 'var(--yb-text)', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+      <h1 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: '600' }}>
+        代わりにやること
+        <div style={{ fontSize: '12px', fontWeight: '400', opacity: 0.6, marginTop: '4px' }}>設定</div>
+      </h1>
+      
       {tasks.map(task => (
-        <div key={task.id} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+        <div key={task.id} style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
           <input
             value={task.text}
             onChange={(e) => updateTask(task.id, e.target.value)}
             placeholder="例: ウォーキング(30分)"
-            style={{ flex: 1, padding: '8px' }}
+            style={{ ...inputStyle, flex: 1 }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#007AFF'}
+            onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(128, 128, 128, 0.3)'}
           />
-          <button onClick={() => removeTask(task.id)} aria-label="削除">✕</button>
+          <button 
+            onClick={() => removeTask(task.id)} 
+            aria-label="削除"
+            style={{
+              minWidth: 44,
+              height: 44,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 8,
+              border: '1px solid rgba(128, 128, 128, 0.3)',
+              background: 'transparent',
+              color: 'var(--yb-text)',
+              cursor: 'pointer',
+              fontSize: '18px',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)'
+              e.currentTarget.style.borderColor = 'rgba(255, 59, 48, 0.5)'
+              e.currentTarget.style.color = '#FF3B30'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.borderColor = 'rgba(128, 128, 128, 0.3)'
+              e.currentTarget.style.color = 'var(--yb-text)'
+            }}
+          >
+            ✕
+          </button>
         </div>
       ))}
-      <div style={{ display: 'flex', gap: '8px', marginTop: '12px', alignItems: 'center' }}>
+      
+      <div style={{ display: 'flex', gap: '8px', marginTop: '16px', alignItems: 'center' }}>
         <IconButton onClick={addTask} label="追加" title="追加">
           <PlusIcon />
         </IconButton>
@@ -115,25 +171,34 @@ function App() {
         </IconButton>
       </div>
 
-      <hr style={{ margin: '16px 0' }} />
-      <div>
-        <label style={{ display: 'block', marginBottom: '8px' }}>リマインダー（分・未設定でOFF）</label>
+      <hr style={{ margin: '24px 0', border: 'none', borderTop: '1px solid rgba(128, 128, 128, 0.2)' }} />
+      
+      <div style={{ marginBottom: '20px' }}>
+        <label style={labelStyle}>リマインダー（分・未設定でOFF）</label>
         <input
           type="number"
           min={1}
           placeholder="例: 30"
           value={settings.remindAfterMinutes ?? ''}
           onChange={e => setSettings({ ...settings, remindAfterMinutes: e.target.value ? Number(e.target.value) : undefined })}
-          style={{ width: '120px', padding: '6px' }}
+          style={{ ...inputStyle, width: '120px' }}
+          onFocus={(e) => e.currentTarget.style.borderColor = '#007AFF'}
+          onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(128, 128, 128, 0.3)'}
         />
       </div>
 
-      <div style={{ marginTop: '12px' }}>
-        <label style={{ display: 'block', marginBottom: '8px' }}>テーマ</label>
+      <div>
+        <label style={labelStyle}>テーマ</label>
         <select
           value={settings.theme ?? 'auto'}
           onChange={e => setSettings({ ...settings, theme: e.target.value as Settings['theme'] })}
-          style={{ padding: '6px' }}
+          style={{
+            ...inputStyle,
+            width: '100%',
+            cursor: 'pointer',
+          }}
+          onFocus={(e) => e.currentTarget.style.borderColor = '#007AFF'}
+          onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(128, 128, 128, 0.3)'}
         >
           <option value="auto">自動（OS設定に追従）</option>
           <option value="light">ライト</option>
