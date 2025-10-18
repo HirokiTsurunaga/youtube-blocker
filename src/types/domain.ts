@@ -6,7 +6,7 @@ export type Settings = {
   showOn: 'every_visit' | 'once_per_session';
   remindAfterMinutes?: number; // 例: 15/30/60, undefinedならOFF
   theme: 'auto' | 'light' | 'dark';
-  language: 'ja' | 'en';
+  language: 'ja' | 'en' | 'es' | 'pt' | 'hi' | 'zh-CN' | 'fr' | 'de' | 'ko' | 'ru';
 };
 export type StorageShape = { tasks: Task[]; settings: Settings };
 

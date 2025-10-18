@@ -1,7 +1,7 @@
 import type { Task, Settings } from '../types/domain'
 import { detectBrowserLanguage, translations } from '../i18n/translations'
 
-export function getDefaultTasks(language: 'ja' | 'en' = 'en'): Task[] {
+export function getDefaultTasks(language: 'ja' | 'en' | 'es' | 'pt' | 'hi' | 'zh-CN' | 'fr' | 'de' | 'ko' | 'ru' = 'en'): Task[] {
 	const texts = translations[language].defaultTasks;
 	return texts.map((text, i) => ({ id: `default-${i + 1}`, text }));
 }

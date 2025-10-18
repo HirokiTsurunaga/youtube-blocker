@@ -222,8 +222,16 @@ function App() {
           onFocus={(e) => e.currentTarget.style.borderColor = '#007AFF'}
           onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(128, 128, 128, 0.3)'}
         >
-          <option value="ja">日本語</option>
           <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="es">Español</option>
+          <option value="pt">Português</option>
+          <option value="hi">हिन्दी</option>
+          <option value="zh-CN">简体中文</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="ko">한국어</option>
+          <option value="ru">Русский</option>
         </select>
       </div>
     </div>

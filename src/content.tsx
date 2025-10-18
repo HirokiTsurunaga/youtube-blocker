@@ -6,7 +6,7 @@ import type { Task, Settings } from './types/domain';
 import { getTranslations } from './i18n/translations';
 
 // オーバーレイコンポーネント（React でタスクリストも描画）
-function BlockerOverlay({ language }: { language: 'ja' | 'en' }) {
+function BlockerOverlay({ language }: { language: 'ja' | 'en' | 'es' | 'pt' | 'hi' | 'zh-CN' | 'fr' | 'de' | 'ko' | 'ru' }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const t = getTranslations(language).overlay;
