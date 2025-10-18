@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import type { Task } from './types/domain'
 import { loadTasks, saveTasks, loadSettings, saveSettings } from './utils/storage'
 import type { Settings } from './types/domain'
+import { getTranslations } from './i18n/translations'
 
 function IconButton({ onClick, label, title, children, variant = 'default' }: { onClick: () => void; label: string; title?: string; children: React.ReactNode; variant?: 'default' | 'primary' }) {
   const isPrimary = variant === 'primary'
@@ -51,7 +52,9 @@ const CheckIcon = () => (
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([])
-  const [settings, setSettings] = useState<Settings>({ showOn: 'once_per_session', remindAfterMinutes: undefined, theme: 'auto' })
+  const [settings, setSettings] = useState<Settings>({ showOn: 'once_per_session', remindAfterMinutes: undefined, theme: 'auto', language: 'ja' })
+  
+  const t = getTranslations(settings.language).popup
 
   useEffect(() => {
     loadTasks().then(setTasks)
@@ -114,8 +117,8 @@ function App() {
   return (
     <div style={{ width: '420px', padding: '20px', backgroundColor: 'var(--yb-bg)', color: 'var(--yb-text)', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       <h1 style={{ marginBottom: '16px', fontSize: '20px', fontWeight: '600' }}>
-        代わりにやること
-        <div style={{ fontSize: '12px', fontWeight: '400', opacity: 0.6, marginTop: '2px' }}>設定</div>
+        {t.title}
+        <div style={{ fontSize: '12px', fontWeight: '400', opacity: 0.6, marginTop: '2px' }}>{t.subtitle}</div>
       </h1>
       
       {tasks.map(task => (
@@ -123,14 +126,14 @@ function App() {
           <input
             value={task.text}
             onChange={(e) => updateTask(task.id, e.target.value)}
-            placeholder="例: ウォーキング(30分)"
+            placeholder={t.taskPlaceholder}
             style={{ ...inputStyle, flex: 1 }}
             onFocus={(e) => e.currentTarget.style.borderColor = '#007AFF'}
             onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(128, 128, 128, 0.3)'}
           />
           <button 
             onClick={() => removeTask(task.id)} 
-            aria-label="削除"
+            aria-label={t.deleteButton}
             style={{
               minWidth: 38,
               height: 38,
@@ -162,11 +165,11 @@ function App() {
       ))}
       
       <div style={{ display: 'flex', gap: '8px', marginTop: '12px', alignItems: 'center' }}>
-        <IconButton onClick={addTask} label="追加" title="追加">
+        <IconButton onClick={addTask} label={t.addButton} title={t.addButton}>
           <PlusIcon />
         </IconButton>
         <div style={{ marginLeft: 'auto' }} />
-        <IconButton onClick={save} label="保存" title="保存" variant="primary">
+        <IconButton onClick={save} label={t.saveButton} title={t.saveButton} variant="primary">
           <CheckIcon />
         </IconButton>
       </div>
@@ -174,11 +177,11 @@ function App() {
       <hr style={{ margin: '16px 0', border: 'none', borderTop: '1px solid rgba(128, 128, 128, 0.2)' }} />
       
       <div style={{ marginBottom: '14px' }}>
-        <label style={labelStyle}>リマインダー（分・未設定でOFF）</label>
+        <label style={labelStyle}>{t.reminderLabel}</label>
         <input
           type="number"
           min={1}
-          placeholder="例: 30"
+          placeholder={t.reminderPlaceholder}
           value={settings.remindAfterMinutes ?? ''}
           onChange={e => setSettings({ ...settings, remindAfterMinutes: e.target.value ? Number(e.target.value) : undefined })}
           style={{ ...inputStyle, width: '120px' }}
@@ -187,8 +190,8 @@ function App() {
         />
       </div>
 
-      <div>
-        <label style={labelStyle}>テーマ</label>
+      <div style={{ marginBottom: '14px' }}>
+        <label style={labelStyle}>{t.themeLabel}</label>
         <select
           value={settings.theme ?? 'auto'}
           onChange={e => setSettings({ ...settings, theme: e.target.value as Settings['theme'] })}
@@ -200,9 +203,27 @@ function App() {
           onFocus={(e) => e.currentTarget.style.borderColor = '#007AFF'}
           onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(128, 128, 128, 0.3)'}
         >
-          <option value="auto">自動（OS設定に追従）</option>
-          <option value="light">ライト</option>
-          <option value="dark">ダーク</option>
+          <option value="auto">{t.themeAuto}</option>
+          <option value="light">{t.themeLight}</option>
+          <option value="dark">{t.themeDark}</option>
+        </select>
+      </div>
+
+      <div>
+        <label style={labelStyle}>{t.languageLabel}</label>
+        <select
+          value={settings.language}
+          onChange={e => setSettings({ ...settings, language: e.target.value as Settings['language'] })}
+          style={{
+            ...inputStyle,
+            width: '100%',
+            cursor: 'pointer',
+          }}
+          onFocus={(e) => e.currentTarget.style.borderColor = '#007AFF'}
+          onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(128, 128, 128, 0.3)'}
+        >
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
         </select>
       </div>
     </div>

@@ -1,22 +1,24 @@
 import { createRoot } from 'react-dom/client';
 import { useEffect, useRef, useState } from 'react';
 import './content.css';
-import { loadTasks, markShownThisSession, wasShownThisSession, loadSettings, getLastShownAt, setLastShownAt, DEFAULT_TASKS } from './utils/storage';
-import type { Task } from './types/domain';
+import { loadTasks, markShownThisSession, wasShownThisSession, loadSettings, getLastShownAt, setLastShownAt, getDefaultTasks } from './utils/storage';
+import type { Task, Settings } from './types/domain';
+import { getTranslations } from './i18n/translations';
 
 // オーバーレイコンポーネント（React でタスクリストも描画）
-function BlockerOverlay() {
+function BlockerOverlay({ language }: { language: 'ja' | 'en' }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const t = getTranslations(language).overlay;
 
   useEffect(() => {
     loadTasks()
       .then(setTasks)
       .catch(err => {
         console.error('Failed to load tasks:', err);
-        setTasks(DEFAULT_TASKS);
+        setTasks(getDefaultTasks(language));
       });
-  }, []);
+  }, [language]);
 
   // dialog をモーダルで開き、閉じたらクリーンアップ
   useEffect(() => {
@@ -41,7 +43,7 @@ function BlockerOverlay() {
   return (
     <dialog ref={dialogRef} id="youtube-blocker-overlay" aria-labelledby="blocker-title">
       <div className="youtube-blocker-card">
-        <h1 id="blocker-title" className="youtube-blocker-title">代わりにやること</h1>
+        <h1 id="blocker-title" className="youtube-blocker-title">{t.title}</h1>
         <ul className="youtube-blocker-list">
           {tasks.map(task => (
             <li key={task.id}>・{task.text}</li>
@@ -54,11 +56,11 @@ function BlockerOverlay() {
           textAlign: 'center',
           opacity: 0.9
         }}>
-          それでも見る？
+          {t.prompt}
         </p>
         <div className="youtube-blocker-actions">
-          <button onClick={handleWatch} className="youtube-blocker-btn watch">見る</button>
-          <button onClick={handleCancel} className="youtube-blocker-btn cancel">やめる</button>
+          <button onClick={handleWatch} className="youtube-blocker-btn watch">{t.watchButton}</button>
+          <button onClick={handleCancel} className="youtube-blocker-btn cancel">{t.cancelButton}</button>
         </div>
       </div>
     </dialog>
@@ -66,7 +68,7 @@ function BlockerOverlay() {
 }
 
 // オーバーレイを表示
-function showBlocker(theme?: 'auto' | 'light' | 'dark') {
+function showBlocker(settings: Settings) {
   // 既に表示済み or このセッションで一度表示しているなら何もしない
   if (document.getElementById('youtube-blocker-root')) return;
   if (wasShownThisSession()) return;
@@ -74,11 +76,11 @@ function showBlocker(theme?: 'auto' | 'light' | 'dark') {
   const container = document.createElement('div');
   container.id = 'youtube-blocker-root';
   // テーマ属性（指定がなければ auto）
-  container.setAttribute('data-yb-theme', theme ?? 'auto');
+  container.setAttribute('data-yb-theme', settings.theme ?? 'auto');
   document.body.appendChild(container);
 
   const root = createRoot(container);
-  root.render(<BlockerOverlay />);
+  root.render(<BlockerOverlay language={settings.language} />);
 
   // このセッションで表示済みとしてマーク
   markShownThisSession();
@@ -87,21 +89,21 @@ function showBlocker(theme?: 'auto' | 'light' | 'dark') {
 }
 
 // セッション回数制約を無視して表示（リマインダー用）
-function forceShowBlocker(theme?: 'auto' | 'light' | 'dark') {
+function forceShowBlocker(settings: Settings) {
   if (document.getElementById('youtube-blocker-root')) return;
   const container = document.createElement('div');
   container.id = 'youtube-blocker-root';
-  container.setAttribute('data-yb-theme', theme ?? 'auto');
+  container.setAttribute('data-yb-theme', settings.theme ?? 'auto');
   document.body.appendChild(container);
   const root = createRoot(container);
-  root.render(<BlockerOverlay />);
+  root.render(<BlockerOverlay language={settings.language} />);
 }
 
 // ページ読み込み時に表示
 async function initialize() {
   const settings = await loadSettings();
   // 直ちに初回表示
-  showBlocker(settings.theme);
+  showBlocker(settings);
 
   // リマインダー：last が無ければ「今 + delay」を基準にする
   if (settings.remindAfterMinutes && settings.remindAfterMinutes > 0) {
@@ -113,7 +115,7 @@ async function initialize() {
       const container = document.getElementById('youtube-blocker-root');
       if (!container) {
         // セッション制約を無視して再表示（ユーザーが再認識できるように）
-        forceShowBlocker(settings.theme);
+        forceShowBlocker(settings);
         setLastShownAt(Date.now());
       }
     }, wait);

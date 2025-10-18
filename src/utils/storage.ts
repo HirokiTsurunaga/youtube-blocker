@@ -1,20 +1,22 @@
 import type { Task, Settings } from '../types/domain'
+import { detectBrowserLanguage, translations } from '../i18n/translations'
 
-const DEFAULT_TASKS: Task[] = [
-	{ id: 'default-1', text: 'ウォーキング(30分)' },
-	{ id: 'default-2', text: 'ジムに行く(1時間)' },
-	{ id: 'default-3', text: '本を読む(1時間)' },
-	{ id: 'default-4', text: 'コードを書く(30分)' },
-]
+export function getDefaultTasks(language: 'ja' | 'en' = 'ja'): Task[] {
+	const texts = translations[language].defaultTasks;
+	return texts.map((text, i) => ({ id: `default-${i + 1}`, text }));
+}
 
 export async function loadTasks(): Promise<Task[]> {
+	const settings = await loadSettings();
+	const defaultTasks = getDefaultTasks(settings.language);
+	
 	try {
 		// chrome が使える場合（拡張の popup / content script）
 		// optional chaining で環境依存エラーを回避
 		if (typeof chrome !== 'undefined' && chrome?.storage?.sync) {
 			return await new Promise<Task[]>((resolve) => {
 				chrome.storage.sync.get(['tasks'], (data: { tasks?: Task[] }) => {
-					resolve(data?.tasks && Array.isArray(data.tasks) && data.tasks.length > 0 ? data.tasks : DEFAULT_TASKS)
+					resolve(data?.tasks && Array.isArray(data.tasks) && data.tasks.length > 0 ? data.tasks : defaultTasks)
 				})
 			})
 		}
@@ -25,11 +27,11 @@ export async function loadTasks(): Promise<Task[]> {
 	// ブラウザ直開きなど拡張外のときは localStorage を使う
 	try {
 		const raw = localStorage.getItem('tasks')
-		if (!raw) return DEFAULT_TASKS
+		if (!raw) return defaultTasks
 		const parsed = JSON.parse(raw) as Task[]
-		return parsed.length > 0 ? parsed : DEFAULT_TASKS
+		return parsed.length > 0 ? parsed : defaultTasks
 	} catch {
-		return DEFAULT_TASKS
+		return defaultTasks
 	}
 }
 
@@ -52,8 +54,6 @@ export async function saveTasks(tasks: Task[]): Promise<void> {
 	}
 }
 
-export { DEFAULT_TASKS }
-
 // 1セッション1回の表示制御（最小実装）
 export function markShownThisSession(): void {
 	try { sessionStorage.setItem('yb_shown', '1'); } catch {}
@@ -65,7 +65,12 @@ export function wasShownThisSession(): boolean {
 
 // 設定の読み書き（リマインダー等）
 export async function loadSettings(): Promise<Settings> {
-	const defaults: Settings = { showOn: 'once_per_session', remindAfterMinutes: undefined, theme: 'auto' };
+	const defaults: Settings = { 
+		showOn: 'once_per_session', 
+		remindAfterMinutes: undefined, 
+		theme: 'auto',
+		language: detectBrowserLanguage()
+	};
 	try {
 		if (typeof chrome !== 'undefined' && chrome?.storage?.sync) {
 			return await new Promise<Settings>((resolve) => {
