@@ -85,13 +85,13 @@ export const translations: Record<Language, Translations> = {
 };
 
 export function getTranslations(lang: Language): Translations {
-  return translations[lang] || translations.ja;
+  return translations[lang] || translations.en;
 }
 
 export function detectBrowserLanguage(): Language {
-  if (typeof navigator === 'undefined') return 'ja';
+  if (typeof navigator === 'undefined') return 'en';
   const lang = navigator.language.toLowerCase();
-  if (lang.startsWith('en')) return 'en';
-  return 'ja';
+  if (lang.startsWith('ja')) return 'ja';
+  return 'en';
 }
 

@@ -52,7 +52,7 @@ const CheckIcon = () => (
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([])
-  const [settings, setSettings] = useState<Settings>({ showOn: 'once_per_session', remindAfterMinutes: undefined, theme: 'auto', language: 'ja' })
+  const [settings, setSettings] = useState<Settings>({ showOn: 'once_per_session', remindAfterMinutes: undefined, theme: 'auto', language: 'en' })
   
   const t = getTranslations(settings.language).popup
 
