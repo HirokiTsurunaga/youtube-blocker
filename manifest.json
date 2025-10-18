@@ -3,6 +3,11 @@
     "name": "YouTube Blocker",
     "version": "1.0",
     "description": "YouTubeを開く前にやることを思い出させる",
+    "icons": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    },
     "permissions": ["tabs", "storage"],
     "host_permissions": ["*://www.youtube.com/*"],
     "background": {
@@ -10,7 +15,12 @@
       "type": "module"
     },
     "action": {
-      "default_popup": "index.html"
+      "default_popup": "index.html",
+      "default_icon": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+      }
     },
     "content_scripts": [
       {
