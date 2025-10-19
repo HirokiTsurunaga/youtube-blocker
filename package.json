@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:e2e": "npm run build && playwright test"
+    "test:e2e": "npm run build && playwright test",
+    "package": "npm run build && cd dist && zip -r ../youtube-blocker.zip . && cd .. && echo 'Created youtube-blocker.zip'"
   },
   "dependencies": {
     "react": "^19.1.1",
